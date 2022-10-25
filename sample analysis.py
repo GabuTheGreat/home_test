@@ -31,20 +31,15 @@ par_dd['today'] = par_dd['today'].dt.strftime('%d/%m/%y')
 #write function to calaculate PAR
 def par (difference_in_days):
     if difference_in_days < 0:
-        par = "On Time"
-        
+        par = "On Time"  
     elif 0 <= difference_in_days <= 7:
-        par = "PAR0-7"
-        
+        par = "PAR0-7"       
     elif 8 <= difference_in_days <= 30:
-        par = "PAR8-30"
-        
+        par = "PAR8-30" 
     elif 31 <= difference_in_days <= 90:
-        par = "PAR31-90"
-        
+        par = "PAR31-90"   
     elif difference_in_days >= 91:
         par = "PAR90+"
-    
     return par
 
 par_dd['PAR'] = par_dd['Difference'].apply(par)
@@ -65,18 +60,35 @@ dd2 = dd[["contract_reference", "name"]]
 def loan_type(name):
     loan_type = ""
     if 'Individual' in name:
-        loan_type = "Individual Loan"
-        
+        loan_type = "Individual Loan"  
     elif 'Group' in name:
-        loan_type = "Group Loan"
-        
-    elif 'Paygo' in name:
-        loan_type = "Paygo Loan"
-        
+        loan_type = "Group Loan"   
+    elif 'PayGo' in name:
+        loan_type = "Paygo Loan" 
     elif 'Cash' in name:
         loan_type = "Cash Sale"
-        
     return loan_type
 
 dd['loan_type'] = dd['name'].apply(loan_type)
+
+#Popular loans loan type and status
+dd2  = dd.groupby(['status', 'loan_type']).size().reset_index(name  = 'counts')
+dd3  = dd.groupby(['loan_type']).size().reset_index(name  = 'counts')
+dd3 = dd3.sort_values(by = ["counts"],ascending=False)
+
+
+#Borrowers with highest arrears
+top_5_highest_borrowers = dd.groupby(['contract_reference'])['total_arrears'].sum().reset_index()
+top_5_highest_borrowers = top_5_highest_borrowers.sort_values(by = ["total_arrears"],ascending=False)
+#Arrangwe and get top 5
+
+#populN LOAN TYPES per loan type
+top_5_highest_borrowers_loan_type = dd.groupby(['loan_type'])['total_arrears'].sum().reset_index()
+top_5_highest_borrowers_loan_type = top_5_highest_borrowers_loan_type.sort_values(by = ["total_arrears"],ascending=False)
+
+#Top loan per region arrears
+top_5_highest_region = dd.groupby(['l3_entity_id'])['total_arrears'].sum().reset_index()
+top_5_highest_region = top_5_highest_region.sort_values(by = ["total_arrears"],ascending=False)
+
+
 
