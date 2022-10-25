@@ -12,9 +12,9 @@ dd = pd.read_csv("~/Documents/challanges/home_test/analytics_specialist_hiring_d
 #Calculating PAR(Portfolio at Risk) Status.
 #subset the to remain with the key columns for PAR calculation
 #** Do the calculation later on the main dataframe **####
-par_dd = dd[["contract_reference", "status", "start_date", "end_date", "next_contract_payment_due_date"]]
+par_dd = dd[["contract_reference", "status", "next_contract_payment_due_date"]]
 #Format the date columns 
-par_dd[["start_date", "end_date", "next_contract_payment_due_date"]] = par_dd[["start_date", "end_date", "next_contract_payment_due_date"]].apply(pd.to_datetime)
+par_dd[["next_contract_payment_due_date"]] = par_dd[["next_contract_payment_due_date"]].apply(pd.to_datetime)
 #Add a column for todays date
 par_dd['today'] = pd.to_datetime(today)
 
@@ -73,8 +73,17 @@ dd['loan_type'] = dd['name'].apply(loan_type)
 
 #Popular loans loan type and status
 dd2  = dd.groupby(['status', 'loan_type']).size().reset_index(name  = 'counts')
+
+#Plot Pie chart - Plotly
+import plotly.express as px
 dd3  = dd.groupby(['loan_type']).size().reset_index(name  = 'counts')
 dd3 = dd3.sort_values(by = ["counts"],ascending=False)
+
+#Draw plotly
+fig =px.pie(dd3, values='counts', names='loan_type')
+fig.show()
+
+
 
 
 #Borrowers with highest arrears
@@ -91,4 +100,11 @@ top_5_highest_region = dd.groupby(['l3_entity_id'])['total_arrears'].sum().reset
 top_5_highest_region = top_5_highest_region.sort_values(by = ["total_arrears"],ascending=False)
 
 
+#Average Total arrears
+
+#Connect to the DB
+import sqlalchemy as sa
+engine = sa.create_engine('postgresql://kevegnjhongrsq:7a9c90ae154a234452ef3ff25d2968512d9155aced9ac757cf20adc34fdf09b7@ec2-54-243-226-219.compute-1.amazonaws.com:5432/dd7lo89ujeuuiu')
+
+par_dd.to_sql('loanbook', con=engine, index = False)
 
