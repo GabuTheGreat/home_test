@@ -104,7 +104,33 @@ top_5_highest_region = top_5_highest_region.sort_values(by = ["total_arrears"],a
 
 #Connect to the DB
 import sqlalchemy as sa
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
+user = ""
+password = ""
+host = ""
+database = ""
+
+import os
+from dotenv import load_dotenv
+
+load_dotenv("")
+
+user = os.getenv('user')
+password = os.getenv('user')
+host = os.getenv('host')
+database = os.getenv('database')
+
+
+
+#Set Up my credentials
 engine = sa.create_engine('postgresql://kevegnjhongrsq:7a9c90ae154a234452ef3ff25d2968512d9155aced9ac757cf20adc34fdf09b7@ec2-54-243-226-219.compute-1.amazonaws.com:5432/dd7lo89ujeuuiu')
 
-par_dd.to_sql('loanbook', con=engine, index = False)
+#Query my loanbook table
+#I have updated my database table with columns which I intend to use only.
+df = pd.read_sql_query('select * from loanbook limit 5;',con=engine)
+df
 

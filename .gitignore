@@ -130,3 +130,7 @@ dmypy.json
 
 #Ignore *.csv
 *.csv
+
+#Ignore CSV
+/.streamlit
+
